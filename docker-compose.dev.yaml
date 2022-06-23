@@ -1,0 +1,90 @@
+version: "3.3"
+services:
+
+  nginx-proxy:
+    image: jwilder/nginx-proxy
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+    labels:
+      - com.github.jrcs.letsencrypt_nginx_proxy_companion.nginx_proxy
+    networks:
+      - dev-network
+
+
+  backend:
+    container_name: webqube-starter-backend
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    #    image: webqube-starter-backend:latest
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      DATABASE_CLIENT: ${DATABASE_CLIENT}
+      DATABASE_HOST: host.docker.internal #https://stackoverflow.com/questions/33357567/econnrefused-for-postgres-on-nodejs-with-dockers
+      DATABASE_NAME: ${DATABASE_NAME}
+      DATABASE_USERNAME: ${DATABASE_USERNAME}
+      DATABASE_PORT: ${DATABASE_PORT}
+      JWT_SECRET: ${JWT_SECRET}
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD}
+      NODE_ENV: ${NODE_ENV}
+      VIRTUAL_HOST: api.example.com
+      VIRTUAL_PORT: '1337'
+#      LETSENCRYPT_HOST: api.example.com
+#      LETSENCRYPT_EMAIL: admin@webqube.de
+    volumes:
+      - ./backend/config:/opt/app/config
+      - ./backend/src:/opt/app/src
+      - ./backend/package.json:/opt/package.json
+      - ./backend/package-lock.json:/opt/package-lock.json # Replace with package-lock.json if using npm
+      - .env:/opt/app/.env
+#    ports:
+#      - "1337:1337"
+    expose:
+      - '1337'
+    networks:
+      - dev-network
+    depends_on:
+      - database
+
+  database:
+    image: postgres:14.0-alpine
+    container_name: webqube-starter-database
+    #    platform: linux/arm64 #for platform error on Apple M1 chips
+    restart: unless-stopped
+    env_file: ./.env
+    environment:
+      POSTGRES_DB: ${DATABASE_NAME}
+      POSTGRES_USER: ${DATABASE_USERNAME}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+    volumes:
+      - data:/var/lib/postgresql/data/ #using a volume
+    ports:
+      - "5432:5432"
+    networks:
+      - dev-network
+
+  frontend:
+    container_name: webqube-starter-frontend
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile-dev
+    environment:
+      VIRTUAL_HOST: app.example.com
+    volumes:
+      - ./frontend/:/usr/src/app
+    ports:
+      - "4200:4200"
+    networks:
+      - dev-network
+
+volumes:
+  data:
+
+networks:
+  dev-network:
+    driver: bridge
