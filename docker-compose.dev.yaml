@@ -51,8 +51,6 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile-dev
-    environment:
-      VIRTUAL_HOST: app.example.com
     volumes:
       - ./frontend/:/usr/src/app
     ports:
