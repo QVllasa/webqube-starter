@@ -1,12 +1,12 @@
 version: "3"
 services:
 
-  backend:
-    image: webqube/starter-backend
-    container_name: webqube-starter-backend
-#    build:
-#      context: ./backend
-#      dockerfile: Dockerfile
+  api:
+#    image: webqube/starter-api
+    container_name: webqube-starter-api
+    build:
+      context: ./api
+      dockerfile: Dockerfile
     restart: unless-stopped
     env_file: .env
     environment:
@@ -22,26 +22,26 @@ services:
       - "traefik.enable=true"
       - "traefik.docker.network=proxy"
       - "traefik.http.routers.app-secure.entrypoints=websecure"
-      - "traefik.http.routers.app-secure.rule=Host(`strapi.webqube.de`)"
-#    volumes:
-#      - ./backend/config:/opt/app/config
-#      - ./backend/src:/opt/app/src
-#      - ./backend/package.json:/opt/package.json
-#      - ./backend/package-lock.json:/opt/package-lock.json # Replace with package-lock.json if using npm
-#      - .env:/opt/app/.env
+      - "traefik.http.routers.app-secure.rule=Host(`${PUBLIC_URL}`)"
+    volumes:
+      - ./api/config:/opt/app/config
+      - ./api/src:/opt/app/src
+      - ./api/package.json:/opt/package.json
+      - ./api/package-lock.json:/opt/package-lock.json # Replace with package-lock.json if using npm
+      - .env:/opt/app/.env
     ports:
       - "1337:1337"
     links:
-      - database
+      - db
     networks:
       - proxy
       - default
     depends_on:
-      - database
+      - db
 
-  database:
+  db:
     image: postgres:14.0-alpine
-    container_name: webqube-starter-database
+    container_name: webqube-starter-db
     restart: unless-stopped
     env_file: ./.env
     environment:
