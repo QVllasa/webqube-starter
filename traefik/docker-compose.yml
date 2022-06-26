@@ -1,0 +1,57 @@
+version: '3'
+
+services:
+  traefik:
+    image: traefik:latest
+    container_name: traefik
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    networks:
+      - proxy
+    ports:
+      - 80:80
+      - 443:443
+    environment:
+      - CF_API_EMAIL=qendrim.vllasa@gmail.com
+      - CF_DNS_API_TOKEN=8ETXXbgChLGJznXNC3VoViMvBlpCL3HrJKNowOUf
+      # - CF_API_KEY=YOU_API_KEY
+      # be sure to use the correct one depending on if you are using a token or key
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /root/traefik/data/traefik.yml:/traefik.yml:ro
+      - /root/traefik/data/acme.json:/acme.json
+      - /root/traefik/data/config.yml:/config.yml:ro
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=proxy"
+      - "traefik.http.routers.traefik-secure.entrypoints=websecure"
+      - "traefik.http.routers.traefik-secure.rule=Host(`monitor.webqube.de`)"
+      - "traefik.http.routers.traefik-secure.service=api@internal"
+      - "traefik.http.middlewares.traefik-secure.basicauth.users=admin:$$apr1$$H2GnyFAx$$9INq4WxHow74Nrrzl9Fr30"
+
+  portainer:
+    image: portainer/portainer-ce
+    container_name: portainer
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    networks:
+      - proxy
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /root/portainer/data:/data
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=proxy"
+      - "traefik.http.routers.portainer-secure.entrypoints=websecure"
+      - "traefik.http.routers.portainer-secure.rule=Host(`portainer.webqube.de`)"
+      - "traefik.http.routers.portainer-secure.service=portainer"
+      - "traefik.http.services.portainer.loadbalancer.server.port=9000"
+
+
+networks:
+  proxy:
+    external: true

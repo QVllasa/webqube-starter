@@ -1,32 +1,41 @@
-version: "3.3"
+version: "3"
 services:
 
   backend:
+    image: webqube/starter-backend
     container_name: webqube-starter-backend
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
+#    build:
+#      context: ./backend
+#      dockerfile: Dockerfile
     restart: unless-stopped
     env_file: .env
     environment:
       DATABASE_CLIENT: ${DATABASE_CLIENT}
-      DATABASE_HOST: host.docker.internal #https://stackoverflow.com/questions/33357567/econnrefused-for-postgres-on-nodejs-with-dockers
+      DATABASE_HOST: ${DATABASE_HOST} #https://stackoverflow.com/questions/33357567/econnrefused-for-postgres-on-nodejs-with-dockers
       DATABASE_NAME: ${DATABASE_NAME}
       DATABASE_USERNAME: ${DATABASE_USERNAME}
       DATABASE_PORT: ${DATABASE_PORT}
       JWT_SECRET: ${JWT_SECRET}
       DATABASE_PASSWORD: ${DATABASE_PASSWORD}
       NODE_ENV: ${NODE_ENV}
-    volumes:
-      - ./backend/config:/opt/app/config
-      - ./backend/src:/opt/app/src
-      - ./backend/package.json:/opt/package.json
-      - ./backend/package-lock.json:/opt/package-lock.json # Replace with package-lock.json if using npm
-      - .env:/opt/app/.env
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=proxy"
+      - "traefik.http.routers.app-secure.entrypoints=websecure"
+      - "traefik.http.routers.app-secure.rule=Host(`strapi.webqube.de`)"
+#    volumes:
+#      - ./backend/config:/opt/app/config
+#      - ./backend/src:/opt/app/src
+#      - ./backend/package.json:/opt/package.json
+#      - ./backend/package-lock.json:/opt/package-lock.json # Replace with package-lock.json if using npm
+#      - .env:/opt/app/.env
     ports:
       - "1337:1337"
+    links:
+      - database
     networks:
-      - dev-network
+      - proxy
+      - default
     depends_on:
       - database
 
@@ -42,25 +51,24 @@ services:
     volumes:
       - data:/var/lib/postgresql/data/ #using a volume
     ports:
-      - "5432:5432"
-    networks:
-      - dev-network
+      - "35432:5432"
 
-  frontend:
-    container_name: webqube-starter-frontend
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile-dev
-    volumes:
-      - ./frontend/:/usr/src/app
-    ports:
-      - "4200:4200"
-    networks:
-      - dev-network
+
+#  frontend:
+#    container_name: webqube-starter-frontend
+#    build:
+#      context: ./frontend
+#      dockerfile: Dockerfile-dev
+#    volumes:
+#      - ./frontend/:/usr/src/app
+#    ports:
+#      - "4200:4200"
+#    networks:
+#      - dev-network
 
 volumes:
   data:
 
 networks:
-  dev-network:
-    driver: bridge
+  proxy:
+    external: true
