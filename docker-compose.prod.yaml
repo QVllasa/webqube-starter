@@ -3,7 +3,6 @@ services:
 
   api:
     image: webqube/starter-api
-    container_name: ${API_CONTAINER_NAME}
     restart: unless-stopped
     env_file: .env
     environment:
@@ -18,10 +17,10 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=proxy"
-      - "traefik.http.routers.api-secure.entrypoints=websecure"
-      - "traefik.http.routers.api-secure.rule=Host(`${PUBLIC_URL}`)"
-      - "traefik.http.routers.api-secure.service=api"
-      - "traefik.http.services.api.loadbalancer.server.port=${PORT}"
+      - "traefik.http.routers.${SUBDOMAIN}-api-secure.entrypoints=websecure"
+      - "traefik.http.routers.${SUBDOMAIN}-api-secure.rule=Host(`${SUBDOMAIN}.${ROOT_URL}`)"
+#      - "traefik.http.routers.api-secure.service=api"
+#      - "traefik.http.services.api.loadbalancer.server.port=${PORT}"
     links:
       - db
     networks:
@@ -32,7 +31,6 @@ services:
 
   db:
     image: postgres:14.0-alpine
-    container_name: ${DB_CONTAINER_NAME}
     restart: unless-stopped
     env_file: ./.env
     environment:
