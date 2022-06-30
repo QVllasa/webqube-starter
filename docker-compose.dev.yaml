@@ -2,7 +2,6 @@ version: "3"
 services:
 
   api:
-#    image: webqube/starter-api
     container_name: ${API_CONTAINER_NAME}
     build:
       context: ./api
@@ -21,16 +20,16 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=proxy"
-      - "traefik.http.routers.app-secure.entrypoints=websecure"
-      - "traefik.http.routers.app-secure.rule=Host(`${PUBLIC_URL}`)"
+      - "traefik.http.routers.api-secure.entrypoints=websecure"
+      - "traefik.http.routers.api-secure.rule=Host(`${PUBLIC_URL}`)"
+      - "traefik.http.routers.api-secure.service=api"
+      - "traefik.http.services.api.loadbalancer.server.port=${PORT}"
     volumes:
       - ./api/config:/opt/app/config
       - ./api/src:/opt/app/src
       - ./api/package.json:/opt/package.json
       - ./api/package-lock.json:/opt/package-lock.json # Replace with package-lock.json if using npm
       - .env:/opt/app/.env
-    ports:
-      - "1337:1337"
     links:
       - db
     networks:
