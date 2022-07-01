@@ -50,6 +50,22 @@ services:
     ports:
       - "35432:5432"
 
+  pgadmin:
+    image: dpage/pgadmin4
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
+    networks:
+      - proxy
+      - default
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=proxy"
+      - "traefik.http.routers.pg-secure.entrypoints=websecure"
+      - "traefik.http.routers.pg-secure.rule=Host(`pgadmin-${SUBDOMAIN}.${ROOT_URL}`)"
+      - "traefik.http.routers.pg-secure.service=pgadmin"
+      - "traefik.http.services.pgadmin.loadbalancer.server.port=${PGADMIN_PORT}"
 
 
 #  frontend:
