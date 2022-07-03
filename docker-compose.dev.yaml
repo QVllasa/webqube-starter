@@ -16,21 +16,14 @@ services:
       JWT_SECRET: ${JWT_SECRET}
       DATABASE_PASSWORD: ${DATABASE_PASSWORD}
       NODE_ENV: ${NODE_ENV}
-    labels:
-      - "traefik.enable=true"
-      - "traefik.docker.network=proxy"
-      - "traefik.http.routers.api-secure.entrypoints=websecure"
-      - "traefik.http.routers.api-secure.rule=Host(`${PUBLIC_URL}`)"
-      - "traefik.http.routers.api-secure.service=api"
-      - "traefik.http.services.api.loadbalancer.server.port=${PORT}"
+    ports:
+      - "1337:1337"
     volumes:
       - ./api/config:/opt/app/config
       - ./api/src:/opt/app/src
       - ./api/package.json:/opt/package.json
       - ./api/package-lock.json:/opt/package-lock.json # Replace with package-lock.json if using npm
       - .env:/opt/app/.env
-    links:
-      - db
     networks:
       - proxy
       - default
@@ -46,27 +39,20 @@ services:
       POSTGRES_USER: ${DATABASE_USERNAME}
       POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
     volumes:
-      - data:/var/lib/postgresql/data/ #using a volume
+      - data:/var/lib/postgresql/data/
     ports:
-      - "35432:5432"
+      - "5432:5432"
 
-  pgadmin:
-    image: dpage/pgadmin4
+  cloudbeaver:
+    image: dbeaver/cloudbeaver
     restart: always
-    environment:
-      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
-      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
+    volumes:
+      - ./db:/opt/cloudbeaver/
+    ports:
+      - "8080:8978"
     networks:
       - proxy
       - default
-    labels:
-      - "traefik.enable=true"
-      - "traefik.docker.network=proxy"
-      - "traefik.http.routers.pg-secure.entrypoints=websecure"
-      - "traefik.http.routers.pg-secure.rule=Host(`pgadmin-${SUBDOMAIN}.${ROOT_URL}`)"
-      - "traefik.http.routers.pg-secure.service=pgadmin"
-      - "traefik.http.services.pgadmin.loadbalancer.server.port=${PGADMIN_PORT}"
-
 
 #  frontend:
 #    container_name: webqube-starter-frontend
@@ -85,4 +71,4 @@ volumes:
 
 networks:
   proxy:
-    external: true
+

@@ -19,10 +19,6 @@ services:
       - "traefik.docker.network=proxy"
       - "traefik.http.routers.${SUBDOMAIN}-api-secure.entrypoints=websecure"
       - "traefik.http.routers.${SUBDOMAIN}-api-secure.rule=Host(`${SUBDOMAIN}.${ROOT_URL}`)"
-#      - "traefik.http.routers.api-secure.service=api"
-#      - "traefik.http.services.api.loadbalancer.server.port=${PORT}"
-    links:
-      - db
     networks:
       - proxy
       - default
@@ -54,6 +50,8 @@ services:
 #      - "4200:4200"
 #    networks:
 #      - dev-network
+
+
 
 volumes:
   data:
