@@ -47,27 +47,28 @@ services:
     image: dbeaver/cloudbeaver
     restart: always
     volumes:
-      - ./db:/opt/cloudbeaver/
+      - cloudbeaverData:/opt/cloudbeaver/
     ports:
       - "8080:8978"
     networks:
       - proxy
       - default
 
-#  frontend:
-#    container_name: webqube-starter-frontend
-#    build:
-#      context: ./frontend
-#      dockerfile: Dockerfile-dev
-#    volumes:
-#      - ./frontend/:/usr/src/app
-#    ports:
-#      - "4200:4200"
-#    networks:
-#      - dev-network
+  app:
+    build:
+      context: ./app
+      dockerfile: Dockerfile-dev
+    volumes:
+      - ./app/:/usr/src/app
+    ports:
+      - "4200:4200"
+    networks:
+      - proxy
+      - default
 
 volumes:
   data:
+  cloudbeaverData:
 
 networks:
   proxy:
