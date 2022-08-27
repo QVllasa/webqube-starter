@@ -1,0 +1,29 @@
+# Stage 1: Compile and Build angular codebase
+
+# choose base image to build off of
+FROM node:latest as build
+
+# set the current working directory for all commands
+WORKDIR /usr/src/web
+
+# Add the source code to app
+COPY ./ /usr/src/web
+
+# copy these over first and run 'npm install' so the node_modules will be cached
+# until the package.json / lock changes
+COPY package.json .
+COPY package-lock.json .
+RUN npm install
+
+# Generate the build of the application
+RUN npm run build
+
+# Stage 2: Serve app with nginx server
+# Use official nginx image as the base image
+FROM nginx:latest
+
+# Copy the build output to replace the default nginx contents.
+COPY --from=build /usr/src/web/dist/web /usr/share/nginx/html
+
+# Expose port 80
+EXPOSE 80

@@ -43,20 +43,20 @@ services:
     ports:
       - "5432:5432"
 
-  cloudbeaver:
-    image: dbeaver/cloudbeaver
-    restart: always
-    volumes:
-      - cloudbeaverData:/opt/cloudbeaver/
-    ports:
-      - "8080:8978"
-    networks:
-      - proxy
-      - default
+#  cloudbeaver:
+#    image: dbeaver/cloudbeaver
+#    restart: always
+#    volumes:
+#      - cloudbeaverData:/opt/cloudbeaver/
+#    ports:
+#      - "8080:8978"
+#    networks:
+#      - proxy
+#      - default
 
   app:
     build:
-      context: ./app
+      context: web
       dockerfile: Dockerfile-dev
     volumes:
       - ./app/:/usr/src/app
