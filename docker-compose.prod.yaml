@@ -11,7 +11,7 @@ services:
     environment:
       DATABASE_CLIENT: ${DATABASE_CLIENT}
       DATABASE_HOST: ${DATABASE_HOST} #https://stackoverflow.com/questions/33357567/econnrefused-for-postgres-on-nodejs-with-dockers
-      DATABASE_NAME: ${DATABASE_NAME}-${SUBDOMAIN}
+      DATABASE_NAME: ${DATABASE_NAME}-${SUBDOMAINAPI}
       DATABASE_USERNAME: ${DATABASE_USERNAME}
       DATABASE_PORT: ${DATABASE_PORT}
       JWT_SECRET: ${JWT_SECRET}
@@ -35,7 +35,7 @@ services:
       - proxy
       - default
     environment:
-      POSTGRES_DB: ${DATABASE_NAME}-${SUBDOMAIN}
+      POSTGRES_DB: ${DATABASE_NAME}-${SUBDOMAINAPI}
       POSTGRES_USER: ${DATABASE_USERNAME}
       POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
     volumes:
