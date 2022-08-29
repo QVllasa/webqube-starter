@@ -29,7 +29,7 @@ COPY conf/default.conf /etc/nginx/conf.d/
 
 CMD ["nginx", "-g", "daemon off;"]
 
-# Expose port 80
-EXPOSE 80
+## Expose port 80
+#EXPOSE 80
 ## Expose port 443
-#EXPOSE 443
+EXPOSE 443
