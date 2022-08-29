@@ -5,9 +5,9 @@ services:
     image: webqube/starter-api
     restart: unless-stopped
     env_file: .env
-    build:
-      context: ./api
-      dockerfile: Dockerfile-prod
+#    build:
+#      context: ./api
+#      dockerfile: Dockerfile-prod
     environment:
       DATABASE_CLIENT: ${DATABASE_CLIENT}
       DATABASE_HOST: ${DATABASE_HOST} #https://stackoverflow.com/questions/33357567/econnrefused-for-postgres-on-nodejs-with-dockers
@@ -46,9 +46,9 @@ services:
     image: webqube/starter-web
     restart: unless-stopped
     env_file: .env
-    build:
-      context: ./web
-      dockerfile: Dockerfile-prod
+#    build:
+#      context: ./web
+#      dockerfile: Dockerfile-prod
     environment:
       NODE_ENV: ${NODE_ENV}
     labels:
