@@ -51,6 +51,8 @@ services:
 #      dockerfile: Dockerfile-prod
     environment:
       NODE_ENV: ${NODE_ENV}
+    ports:
+      - "8082:80"
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=proxy"
