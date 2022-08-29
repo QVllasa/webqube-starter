@@ -63,9 +63,9 @@ services:
       context: web
       dockerfile: Dockerfile-dev
     volumes:
-      - ./app/:/usr/src/app
+      - ./web/:/usr/src/app
     ports:
-      - "80:4200"
+      - "4200:4200"
     networks:
       - proxy
       - default
