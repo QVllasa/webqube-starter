@@ -57,9 +57,9 @@ services:
       - "traefik.docker.network=proxy"
       - "traefik.http.routers.${SUBDOMAINWEB}-api-secure.entrypoints=websecure"
       - "traefik.http.routers.${SUBDOMAINWEB}-api-secure.rule=Host(`${SUBDOMAINWEB}.${ROOT_URL}`)"
-#    build:
-#      context: ./web
-#      dockerfile: Dockerfile-prod
+    build:
+      context: ./web
+      dockerfile: Dockerfile-prod
 #    volumes:
 #      - ./web/:/usr/src/app
     networks:
