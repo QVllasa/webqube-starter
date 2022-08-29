@@ -1,6 +1,7 @@
 version: "3"
 services:
 
+  #Strapi API
   api:
     build:
       context: ./api
@@ -22,7 +23,7 @@ services:
       - ./api/config:/opt/app/config
       - ./api/src:/opt/app/src
       - ./api/package.json:/opt/package.json
-      - ./api/package-lock.json:/opt/package-lock.json # Replace with package-lock.json if using npm
+      - ./api/package-lock.json:/opt/package-lock.json
       - .env:/opt/app/.env
     networks:
       - proxy
@@ -30,6 +31,7 @@ services:
     depends_on:
       - db
 
+  #Database
   db:
     image: postgres:14.0-alpine
     restart: unless-stopped
@@ -43,17 +45,19 @@ services:
     ports:
       - "5432:5432"
 
-#  cloudbeaver:
-#    image: dbeaver/cloudbeaver
-#    restart: always
-#    volumes:
-#      - cloudbeaverData:/opt/cloudbeaver/
-#    ports:
-#      - "8080:8978"
-#    networks:
-#      - proxy
-#      - default
+  #Database manager in dev mode
+  cloudbeaver:
+    image: dbeaver/cloudbeaver
+    restart: always
+    volumes:
+      - cloudbeaverData:/opt/cloudbeaver/
+    ports:
+      - "8080:8978"
+    networks:
+      - proxy
+      - default
 
+  #Angular Frontend app
   app:
     build:
       context: web
@@ -61,7 +65,7 @@ services:
     volumes:
       - ./app/:/usr/src/app
     ports:
-      - "4200:4200"
+      - "80:4200"
     networks:
       - proxy
       - default
