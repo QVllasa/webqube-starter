@@ -1,0 +1,70 @@
+version: "3"
+services:
+
+  api:
+    restart: unless-stopped
+    env_file: .env
+    build:
+      context: ./api
+      dockerfile: Dockerfile-prod
+    environment:
+      DATABASE_CLIENT: ${DATABASE_CLIENT}
+      DATABASE_HOST: ${DATABASE_HOST} #https://stackoverflow.com/questions/33357567/econnrefused-for-postgres-on-nodejs-with-dockers
+      DATABASE_NAME: ${DATABASE_NAME}-${SUBDOMAINAPI}
+      DATABASE_USERNAME: ${DATABASE_USERNAME}
+      DATABASE_PORT: ${DATABASE_PORT}
+      JWT_SECRET: ${JWT_SECRET}
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD}
+      NODE_ENV: ${NODE_ENV}
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=proxy"
+      - "traefik.http.routers.${SUBDOMAINAPI}-api-secure.entrypoints=websecure"
+      - "traefik.http.routers.${SUBDOMAINAPI}-api-secure.rule=Host(`${SUBDOMAINAPI}.${ROOT_URL}`)"
+    networks:
+      - proxy
+      - default
+    depends_on:
+      - db
+
+  db:
+    image: postgres:14.0-alpine
+    restart: unless-stopped
+    networks:
+      - proxy
+      - default
+    environment:
+      POSTGRES_DB: ${DATABASE_NAME}-${SUBDOMAINAPI}
+      POSTGRES_USER: ${DATABASE_USERNAME}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+    volumes:
+      - data:/var/lib/postgresql/data/ #using a volume
+
+
+  web:
+    restart: unless-stopped
+    env_file: .env
+    build:
+      context: ./web
+      dockerfile: Dockerfile-prod
+    environment:
+      NODE_ENV: ${NODE_ENV}
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=proxy"
+      - "traefik.http.routers.${SUBDOMAINWEB}-api-secure.entrypoints=websecure"
+      - "traefik.http.routers.${SUBDOMAINWEB}-api-secure.rule=Host(`${SUBDOMAINWEB}.${ROOT_URL}`)"
+    networks:
+      - proxy
+      - default
+    depends_on:
+      - api
+
+
+
+volumes:
+  data:
+
+networks:
+  proxy:
+    external: true
