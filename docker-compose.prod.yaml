@@ -42,28 +42,28 @@ services:
       - data:/var/lib/postgresql/data/ #using a volume
 
 
-  web:
-    image: webqube/starter-web
-    restart: unless-stopped
-    env_file: .env
-#    build:
-#      context: ./web
-#      dockerfile: Dockerfile-prod
-    environment:
-      NODE_ENV: ${NODE_ENV}
-    ports:
-      - "8082:80"
-      - "8083:443"
-    labels:
-      - "traefik.enable=true"
-      - "traefik.docker.network=proxy"
-      - "traefik.http.routers.${SUBDOMAINWEB}-api-secure.entrypoints=websecure"
-      - "traefik.http.routers.${SUBDOMAINWEB}-api-secure.rule=Host(`${SUBDOMAINWEB}.${ROOT_URL}`)"
-    networks:
-      - proxy
-      - default
-    depends_on:
-      - api
+#  web:
+#    image: webqube/starter-web
+#    restart: unless-stopped
+#    env_file: .env
+##    build:
+##      context: ./web
+##      dockerfile: Dockerfile-prod
+#    environment:
+#      NODE_ENV: ${NODE_ENV}
+#    ports:
+#      - "8082:80"
+#      - "8083:443"
+#    labels:
+#      - "traefik.enable=true"
+#      - "traefik.docker.network=proxy"
+#      - "traefik.http.routers.${SUBDOMAINWEB}-api-secure.entrypoints=websecure"
+#      - "traefik.http.routers.${SUBDOMAINWEB}-api-secure.rule=Host(`${SUBDOMAINWEB}.${ROOT_URL}`)"
+#    networks:
+#      - proxy
+#      - default
+#    depends_on:
+#      - api
 
 
 
